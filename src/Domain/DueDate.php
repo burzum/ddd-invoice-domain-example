@@ -13,8 +13,12 @@ class DueDate extends \DateTime
     /**
      * Constructor
      */
-    public function __construct(string $time = '+2 weeks', \DateTimeZone $timezone = null)
+    public function __construct(?string $time = null, DateTimeZone $timezone = null)
     {
+        if (is_null($time)) {
+            $time = '+2 weeks';
+        }
+
         parent::__construct($time, $timezone);
     }
 }

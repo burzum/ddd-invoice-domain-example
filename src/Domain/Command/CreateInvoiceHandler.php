@@ -26,5 +26,4 @@ class CreateInvoiceHandler
         $invoice = $this->factory->fromArray($command->getData());
         $this->repository->save($invoice);
     }
-
 }

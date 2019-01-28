@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Psa\Invoicing\Domain\Service;
 
+use Psa\Invoicing\Domain\Invoice;
+
 /**
  * InvoiceCalculator
  */
@@ -11,9 +13,8 @@ class InvoiceCalculator
 
     protected $VATCalculator;
 
-    public function __construct(VATCalculator $VATCalculator)
+    public function __construct()
     {
-        $this->VATCalculator = $VATCalculator;
     }
 
     /**
@@ -35,5 +36,4 @@ class InvoiceCalculator
             $vat
         );
     }
-
 }

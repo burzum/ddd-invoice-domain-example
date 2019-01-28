@@ -8,19 +8,19 @@ namespace Psa\Invoicing\Domain\Service;
  */
 class InvoiceCalculatorResult
 {
-	/**
-	 * @var float
-	 */
+    /**
+     * @var float
+     */
     protected $gross = 0.00;
 
-	/**
-	 * @var float
-	 */
+    /**
+     * @var float
+     */
     protected $nett = 0.00;
 
-	/**
-	 * @var float
-	 */
+    /**
+     * @var float
+     */
     protected $VAT = 0.00;
 
     public function __construct(
@@ -41,17 +41,17 @@ class InvoiceCalculatorResult
         return $this->gross;
     }
 
-	/**
-	 * @return float
-	 */
+    /**
+     * @return float
+     */
     public function getNett()
     {
         return $this->nett;
     }
 
-	/**
-	 * @return float
-	 */
+    /**
+     * @return float
+     */
     public function getVAT()
     {
         return $this->VAT;

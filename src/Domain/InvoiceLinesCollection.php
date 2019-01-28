@@ -12,7 +12,11 @@ use IteratorAggregate ;
  */
 class InvoiceLinesCollection implements IteratorAggregate, Countable
 {
-
+    /**
+     * Lines
+     *
+     * @var array
+     */
     protected $lines = [];
 
     public function add(InvoiceLine $line)
@@ -28,15 +32,5 @@ class InvoiceLinesCollection implements IteratorAggregate, Countable
     public function count(): int
     {
         return count($this->lines);
-    }
-
-    public function toArray(): array
-    {
-        $array = [];
-        foreach ($this->lines as $line) {
-            $array[] = $line->toArray();
-        }
-
-        return $array;
     }
 }

@@ -13,7 +13,9 @@
         }
     ],
     "require": {
-        "psr/http-server-handler": "^1.0"
+        "psr/http-server-handler": "^1.0",
+        "beberlei/assert": "^3.2",
+        "myclabs/php-enum": "^1.6"
     },
     "autoload": {
         "psr-4": {

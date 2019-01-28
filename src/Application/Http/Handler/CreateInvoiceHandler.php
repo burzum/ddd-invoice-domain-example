@@ -25,11 +25,9 @@ class ViewInvoice implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         if (!$this->Validator->validate($request->getData())) {
-
         }
 
         $command = new CreateInvoiceCommand($request->getData());
         $this->dispatcher($command);
     }
-
 }

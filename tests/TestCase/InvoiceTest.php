@@ -3,9 +3,14 @@ namespace Psa\Invoicing\Test\TestCase;
 
 use DateTime;
 use PHPUnit\Framework\TestCase;
+use Psa\Invoicing\Common\Currency;
+use Psa\Invoicing\Common\Salutation;
 use Psa\Invoicing\Domain\Address;
 use Psa\Invoicing\Domain\Invoice;
+use Psa\Invoicing\Domain\InvoiceLine;
 use Psa\Invoicing\Domain\InvoiceLinesCollection;
+use Psa\Invoicing\Domain\ItemId;
+use Psa\Invoicing\Domain\Price;
 use Psa\Invoicing\Domain\Service\InvoiceCalculator;
 use Psa\Invoicing\Domain\Service\VATCalculator;
 
@@ -27,8 +32,8 @@ class InvoiceTest extends TestCase {
 		];
 
 		$address = Address::create(
-			'',
-			'Mr',
+			null,
+			Salutation::MR(),
 			'Florian',
 			'Krämer',
 			'',
@@ -40,14 +45,19 @@ class InvoiceTest extends TestCase {
 		);
 
 		$invoiceLines = new InvoiceLinesCollection();
+		$invoiceLines->add(new InvoiceLine(null, new ItemId(1), 'test', 10, new Price(10, Currency::EUR())));
+		$invoiceLines->add(new InvoiceLine(null, new ItemId(2), 'test', 10, new Price(10, Currency::EUR())));
+
+		$invoiceCalculator = new InvoiceCalculator();
 
 		$invoice = Invoice::create(
+			$invoiceCalculator,
 			$address,
 			$invoiceLines,
-			new DateTime(),
-			'EUR'
+			Currency::EUR(),
+			new DateTime()
 		);
 
-		var_dump($invoice->toArray());
+		var_dump($invoice);
 	}
 }

@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Psa\Invoicing\Domain;
 
+use Assert\Assert;
+use Psa\Invoicing\Common\Title;
 use RuntimeException;
 
 /**
@@ -10,7 +12,6 @@ use RuntimeException;
  */
 class Address
 {
-
     protected $title = '';
     protected $salutation = '';
     protected $firstName = '';
@@ -22,9 +23,12 @@ class Address
     protected $zip = null;
     protected $country = null;
 
+    /**
+     * Creates a new address
+     */
     public static function create(
-        string $title = '',
-        string $salutation = '',
+        ?Title $title = null,
+        ?Salutation $salutation = null,
         string $firstName = '',
         string $lastName = '',
         string $company = '',
@@ -51,34 +55,5 @@ class Address
         $address->country = $country;
 
         return $address;
-    }
-
-    public function getStreet()
-    {
-
-    }
-
-    public function getStreet2()
-    {
-
-    }
-
-    public function getFirstName()
-    {
-
-    }
-
-    public function getLastName()
-    {
-        if (empty($this->company) && empty($this->lastName)) {
-            throw new RuntimeException('The address cant have an empty company and name');
-        }
-    }
-
-    public function getCompany()
-    {
-        if (empty($this->company) && empty($this->lastName)) {
-            throw new RuntimeException('The address cant have an empty company and name');
-        }
     }
 }

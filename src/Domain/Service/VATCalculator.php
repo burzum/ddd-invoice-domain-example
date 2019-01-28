@@ -21,5 +21,4 @@ class VATCalculator
     {
         return $this->repository->getNextId();
     }
-
 }

@@ -26,5 +26,4 @@ class ViewInvoiceHandler implements RequestHandlerInterface
 
         return new Response(200, $invoice);
     }
-
 }

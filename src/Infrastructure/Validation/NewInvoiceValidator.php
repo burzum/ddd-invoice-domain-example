@@ -11,5 +11,4 @@ class NewInvoiceValidator
     {
         return true;
     }
-
 }

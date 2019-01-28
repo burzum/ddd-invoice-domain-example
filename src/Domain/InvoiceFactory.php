@@ -18,7 +18,6 @@ class InvoiceFactory
     public function __construct(
         ReadRepositoryInterface $addressRepo
     ) {
-
     }
 
     public function fromArray($array): Invoice

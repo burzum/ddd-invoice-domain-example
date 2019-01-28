@@ -22,7 +22,7 @@ class InvoiceLine
      */
     public function __construct(
         ?int $id,
-        int $itemId,
+        ItemId $itemId,
         string $itemName,
         int $quantity,
         Price $price,
@@ -34,6 +34,7 @@ class InvoiceLine
         $this->itemDescription = $description;
         $this->quantity = $quantity;
         $this->price = $price;
+        $this->total = new Price((float)($this->price->getValue() * $this->quantity), $price->getCurrency());
     }
 
     public function getPrice(): Price
@@ -43,23 +44,22 @@ class InvoiceLine
 
     public function getTotal(): Price
     {
-        return new Price($this->price * $this->quantity, $this->currency);
+        return new Price($this->price->getValue() * $this->quantity, $this->currency);
     }
 
     public function getId(): int
     {
-
     }
 
     public function toArray(): array
     {
         return [
-        'id' => $this->id,
-        'item_id' => $this->itemName,
-        'item_name' => $this->itemName,
-        'item_description' => $this->itemName,
-        'price' => $this->quantity,
-        'quantity' => $this->quantity
+            'id' => $this->id,
+            'item_id' => $this->itemName,
+            'item_name' => $this->itemName,
+            'item_description' => $this->itemName,
+            'price' => $this->quantity,
+            'quantity' => $this->quantity
         ];
     }
 }

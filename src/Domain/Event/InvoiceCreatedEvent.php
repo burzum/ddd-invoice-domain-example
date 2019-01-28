@@ -24,5 +24,4 @@ class InvoiceCreatedEvent
     {
         return $this->invoice;
     }
-
 }

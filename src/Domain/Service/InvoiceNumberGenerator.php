@@ -23,5 +23,4 @@ class InvoiceNumberGenerator
     {
         return $this->repository->getNextId();
     }
-
 }

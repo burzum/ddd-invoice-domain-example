@@ -24,5 +24,4 @@ class InvoicePaidEvent
     {
         return $this->invoice;
     }
-
 }

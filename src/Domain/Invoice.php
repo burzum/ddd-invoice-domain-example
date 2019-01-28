@@ -3,9 +3,11 @@ declare(strict_types = 1);
 
 namespace Psa\Invoicing\Domain;
 
+use Assert\Assert;
 use DateTime;
 use DateTimeInterface;
 use DateInterval;
+use Psa\Invoicing\Common\Currency;
 use Psa\Invoicing\Domain\Exception\CurrencyMissMatchException;
 use Psa\Invoicing\Domain\Exception\EmptyInvoiceException;
 use Psa\Invoicing\Domain\Service\InvoiceCalculator;
@@ -23,7 +25,7 @@ class Invoice
     protected $gross = 0.00;
     protected $nett = 0.00;
     protected $vat = 0.00;
-    protected $currency = 'USD';
+    protected $currency = Currency::DEFAULT;
     protected $vatPercent = 0.00;
     protected $dueDate = null;
     protected $firstReminder = null;
@@ -40,24 +42,10 @@ class Invoice
         Address $address,
         InvoiceLinesCollection $invoiceLines
     ) {
+        Assert::that($invoiceLines, 'An invoice must have at least one item')->minCount(1);
+
         $this->Address = $address;
         $this->InvoiceLines = $invoiceLines;
-    }
-
-    /**
-     *
-     */
-    public function setAddress(Address $address)
-    {
-        $this->Address = $address;
-    }
-
-    /**
-     *
-     */
-    public function getAddress()
-    {
-        return $this->Address;
     }
 
     /**
@@ -66,7 +54,7 @@ class Invoice
      * @param null|\DateTimeInterface $date Date
      * @return $this
      */
-    public function setDueDate(?DateTimeInterface $date = null)
+    protected function calculateDueDates(?DateTimeInterface $date = null): self
     {
         if (empty($data)) {
             $date = new DueDate();
@@ -90,12 +78,8 @@ class Invoice
         ?DateTimeInterface $paymentDate,
         ?PaymentStatus $paymentStatus
     ) {
-        if ($this->InvoiceLines->count() === 0) {
-            throw new EmptyInvoiceException('Empty invoices can not flagged as paid');
-        }
-
-        $this->paymentDate = empty($paymentDate) ? new DateTime() : $paymentDate;
-        $this->paymentStatus = empty($paymentStatus) ? PaymentStatus::PAID : $paymentStatus;
+        $this->paymentDate = $paymentDate === null ? new DateTime() : $paymentDate;
+        $this->paymentStatus = $paymentStatus === null ? PaymentStatus::PAID() : $paymentStatus;
 
         return $this;
     }
@@ -123,14 +107,13 @@ class Invoice
     /**
      * @link https://softwareengineering.stackexchange.com/questions/357969/ddd-injecting-services-on-entity-methods-calls
      */
-    public function calculate()
+    public function calculate(InvoiceCalculator $calculator)
     {
-        $result = $this->Calculator->calculate($this);
+        $result = $calculator->calculate($this);
 
         $this->gross = $result->getGross();
         $this->nett = $result->getNett();
         $this->VAT = $result->getVAT();
-        $this->VATpercent = $result->getVATpercent();
     }
 
     /**
@@ -139,14 +122,17 @@ class Invoice
      * @return \Psa\Invoicing\Domain\Invoice
      */
     public static function create(
+        InvoiceCalculator $invoiceCalculator,
         Address $address,
-        InvoiceLinesCollection $invoiceLines
+        InvoiceLinesCollection $invoiceLines,
+        Currency $currency,
+        ?DateTime $invoiceDate
     ): Invoice {
         $invoice = new self($address, $invoiceLines);
-        $invoice->currency = 'EUR';
-        $invoice->invoiceDate = (new DateTime());
-        $invoice->setDueDate();
-        $invoice->calculate();
+        $invoice->currency = $currency;
+        $invoice->invoiceDate = $invoiceDate === null ? new DateTime() : $invoiceDate;
+        $invoice->calculateDueDates();
+        $invoice->calculate($invoiceCalculator);
 
         return $invoice;
     }

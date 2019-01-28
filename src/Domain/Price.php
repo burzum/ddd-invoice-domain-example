@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Psa\Invoicing\Domain;
 
+use Psa\Invoicing\Common\Currency;
+
 /**
  * Price
  */
@@ -14,7 +16,7 @@ class Price
 
     public function __construct(
         float $value,
-        string $currency
+        Currency $currency
     ) {
         $this->currency = $currency;
         $this->value = $value;
