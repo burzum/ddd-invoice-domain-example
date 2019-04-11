@@ -15,6 +15,7 @@ class Address
     protected $title = '';
     protected $salutation = '';
     protected $firstName = '';
+    protected $middlename = '';
     protected $lastName = '';
     protected $company = '';
     protected $street = '';
@@ -29,11 +30,12 @@ class Address
     public static function create(
         ?Title $title = null,
         ?Salutation $salutation = null,
-        string $firstName = '',
-        string $lastName = '',
-        string $company = '',
+        string $firstName,
+        ?string $middlename = null,
+        string $lastName,
+        ?string $company = null,
         string $street,
-        string $street2 = '',
+        ?string $street2 = null,
         string $city,
         string $zip,
         string $country

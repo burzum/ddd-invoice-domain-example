@@ -9,7 +9,7 @@ use Ramsey\Uuid\Uuid;
 /**
  * ItemId
  */
-class ItemId
+class InvoiceId
 {
     protected $id;
 

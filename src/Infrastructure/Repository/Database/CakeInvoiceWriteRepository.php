@@ -7,8 +7,9 @@ use Cake\ORM\Table;
 
 class CakeInvoiceWriteRepository implements InvoiceWriteRepositoryInterface
 {
-    public function __construct()
+    public function __construct(InvoiceTable $invoiceTable)
     {
+        /// Tableregistry::get()...
     }
 
     public function create(Invoice $invoice)

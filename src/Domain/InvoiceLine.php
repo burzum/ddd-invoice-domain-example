@@ -3,12 +3,13 @@ declare(strict_types = 1);
 
 namespace Psa\Invoicing\Domain;
 
+use Assert\Assert;
+
 /**
  * InvoiceLine
  */
 class InvoiceLine
 {
-
     protected $id;
     protected $itemId;
     protected $itemName;
@@ -28,6 +29,10 @@ class InvoiceLine
         Price $price,
         ?string $description = null
     ) {
+        Assert::that($itemId)->notBlank();
+        Assert::that($itemName)->notBlank();
+        Assert::that($price)->float();
+
         $this->id = $id;
         $this->itemId = $itemId;
         $this->itemName = $itemName;

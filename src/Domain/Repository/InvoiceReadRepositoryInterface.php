@@ -7,6 +7,4 @@ interface InvoiceReadRepositoryInterface
 {
 
     public function getById(string $string): Invoice;
-
-    public function getNextId(): int;
 }

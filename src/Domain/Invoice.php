@@ -40,12 +40,33 @@ class Invoice
      */
     public function __construct(
         Address $address,
-        InvoiceLinesCollection $invoiceLines
+        InvoiceLinesCollection $invoiceLines,
+        string $id,
+        string $companyId,
+        string $countryCode,
+        string $currencyCode,
+        ?string $invoiceNumber,
+        DateTimeInterface $dueDate,
+        string $paymentStatus,
+        float $gross,
+        float $nett,
+        float $vat,
+        DateTimeInterface $created
     ) {
         Assert::that($invoiceLines, 'An invoice must have at least one item')->minCount(1);
 
         $this->Address = $address;
         $this->InvoiceLines = $invoiceLines;
+        $this->id = $id;
+        $this->companyId = $companyId;
+        $this->countryCode = $countryCode;
+        $this->currencyCode = $currencyCode;
+        $this->invoiceNumber = $invoiceNumber;
+        $this->dueDate = $dueDate;
+        $this->paymentStatus = $paymentStatus;
+        $this->gross = $gross;
+        $this->nett = $nett;
+        $this->vat = $vat;
     }
 
     /**
@@ -56,7 +77,7 @@ class Invoice
      */
     protected function calculateDueDates(?DateTimeInterface $date = null): self
     {
-        if (empty($data)) {
+        if (empty($date)) {
             $date = new DueDate();
         }
 
@@ -129,6 +150,7 @@ class Invoice
         ?DateTime $invoiceDate
     ): Invoice {
         $invoice = new self($address, $invoiceLines);
+        $invoice->id = new InvoiceId();
         $invoice->currency = $currency;
         $invoice->invoiceDate = $invoiceDate === null ? new DateTime() : $invoiceDate;
         $invoice->calculateDueDates();
