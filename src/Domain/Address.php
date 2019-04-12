@@ -4,6 +4,8 @@ declare(strict_types = 1);
 namespace Psa\Invoicing\Domain;
 
 use Assert\Assert;
+use Psa\Invoicing\Common\Country;
+use Psa\Invoicing\Common\Salutation;
 use Psa\Invoicing\Common\Title;
 use RuntimeException;
 
@@ -15,7 +17,7 @@ class Address
     protected $title = '';
     protected $salutation = '';
     protected $firstName = '';
-    protected $middlename = '';
+    protected $middleName = '';
     protected $lastName = '';
     protected $company = '';
     protected $street = '';
@@ -27,35 +29,39 @@ class Address
     /**
      * Creates a new address
      */
-    public static function create(
+    public function __construct(
         ?Title $title = null,
         ?Salutation $salutation = null,
         string $firstName,
-        ?string $middlename = null,
+        ?string $middleName = null,
         string $lastName,
         ?string $company = null,
         string $street,
         ?string $street2 = null,
         string $city,
         string $zip,
-        string $country
+        string $country,
+        string $countryState
     ) {
         if (empty($company) && empty($lastName)) {
             throw new RuntimeException('The address cant have an empty company and name');
         }
 
-        $address = new self();
-        $address->title = $title;
-        $address->salutation = $salutation;
-        $address->firstName = $firstName;
-        $address->lastName = $lastName;
-        $address->company = $company;
-        $address->street = $street;
-        $address->street2 = $street2;
-        $address->city = $city;
-        $address->zip = $city;
-        $address->country = $country;
+        $this->title = $title;
+        $this->salutation = $salutation;
+        $this->firstName = $firstName;
+        $this->middlename = $middleName;
+        $this->lastName = $lastName;
+        $this->company = $company;
+        $this->street = $street;
+        $this->street2 = $street2;
+        $this->city = $city;
+        $this->zip = $city;
+        $this->country = $country;
+    }
 
-        return $address;
+    public function getCountryCode()
+    {
+        return $this->country;
     }
 }

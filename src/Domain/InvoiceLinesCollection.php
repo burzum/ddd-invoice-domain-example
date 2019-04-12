@@ -5,12 +5,13 @@ namespace Psa\Invoicing\Domain;
 
 use ArrayIterator;
 use Countable;
-use IteratorAggregate ;
+use IteratorAggregate;
+use JsonSerializable;
 
 /**
  * Invoice Lines Collection
  */
-class InvoiceLinesCollection implements IteratorAggregate, Countable
+class InvoiceLinesCollection implements IteratorAggregate, Countable, JsonSerializable
 {
     /**
      * Lines
@@ -19,18 +20,57 @@ class InvoiceLinesCollection implements IteratorAggregate, Countable
      */
     protected $lines = [];
 
-    public function add(InvoiceLine $line)
+    /**
+     * Construct
+     *
+     * @var array $lines Array of line items
+     */
+    public function __construct(array $lines = [])
     {
-        $this->lines[] = $line;
+        foreach ($lines as $line) {
+            $this->add($line);
+        }
     }
 
+    /**
+     * Add an invoice line
+     *
+     * @param \Psa\Invoicing\Domain\InvoiceLine
+     * @return $this
+     */
+    public function add(InvoiceLine $line): InvoiceLinesCollection
+    {
+        $this->lines[] = $line;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getIterator()
     {
         return new ArrayIterator($this->lines);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function count(): int
     {
         return count($this->lines);
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        return $this->lines;
     }
 }

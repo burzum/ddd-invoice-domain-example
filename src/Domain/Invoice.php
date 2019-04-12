@@ -7,6 +7,7 @@ use Assert\Assert;
 use DateTime;
 use DateTimeInterface;
 use DateInterval;
+use Psa\Invoicing\Common\AggregateInterface;
 use Psa\Invoicing\Common\Currency;
 use Psa\Invoicing\Domain\Exception\CurrencyMissMatchException;
 use Psa\Invoicing\Domain\Exception\EmptyInvoiceException;
@@ -15,11 +16,26 @@ use Psa\Invoicing\Domain\Service\InvoiceCalculator;
 /**
  * Invoice Aggregate
  */
-class Invoice
+class Invoice implements AggregateInterface
 {
-    protected $id = null;
+    /**
+     * @var \Psa\Invoicing\Domain\Address
+     */
     protected $Address = null;
+
+    /**
+     * @var \Psa\Invoicing\Domain\InvoiceLinesCollection
+     */
     protected $InvoiceLines = null;
+
+    /**
+     * Calculator
+     *
+     * @var \Psa\Invoicing\Domain\Service\InvoiceCalculator
+     */
+    protected $Calculator;
+
+    protected $id = null;
     protected $calculator = null;
     protected $paymentStatus = PaymentStatus::UNPAID;
     protected $gross = 0.00;
@@ -39,34 +55,26 @@ class Invoice
      * Constructor
      */
     public function __construct(
+        InvoiceCalculator $Calculator,
         Address $address,
         InvoiceLinesCollection $invoiceLines,
         string $id,
-        string $companyId,
-        string $countryCode,
-        string $currencyCode,
-        ?string $invoiceNumber,
-        DateTimeInterface $dueDate,
-        string $paymentStatus,
-        float $gross,
-        float $nett,
-        float $vat,
-        DateTimeInterface $created
+        ?string $companyId,
+        Currency $currencyCode,
+        string $invoiceNumber
     ) {
         Assert::that($invoiceLines, 'An invoice must have at least one item')->minCount(1);
+        Assert::that($id)->uuid();
 
         $this->Address = $address;
         $this->InvoiceLines = $invoiceLines;
+        $this->Calculator = $Calculator;
+
         $this->id = $id;
         $this->companyId = $companyId;
-        $this->countryCode = $countryCode;
         $this->currencyCode = $currencyCode;
         $this->invoiceNumber = $invoiceNumber;
-        $this->dueDate = $dueDate;
-        $this->paymentStatus = $paymentStatus;
-        $this->gross = $gross;
-        $this->nett = $nett;
-        $this->vat = $vat;
+        $this->paymentStatus = PaymentStatus::UNPAID();
     }
 
     /**
@@ -94,6 +102,8 @@ class Invoice
 
     /**
      * Flags the invoice as paid
+     *
+     * @return $this
      */
     public function paid(
         ?DateTimeInterface $paymentDate,
@@ -106,19 +116,25 @@ class Invoice
     }
 
     /**
+     * Adds an invoice line
      *
+     * @param \Psa\Invoicing\Domain\InvoiceLine $line Line
+     * @return $this
      */
-    public function addLine(InvoiceLine $line)
+    public function addLine(InvoiceLine $line): self
     {
-        if ($this->currency !== $line->getPrice()->getValue()) {
+        if ($this->currency !== $line->getPrice()->getCurrency()) {
             throw CurrencyMissMatchException::create($this, $line);
         }
 
         $this->InvoiceLines->add($line);
+        $this->calculate();
     }
 
     /**
+     * Gets the line items
      *
+     * @return \Psa\Invoicing\Domain\InvoiceLinesCollection
      */
     public function getLines(): InvoiceLinesCollection
     {
@@ -126,11 +142,21 @@ class Invoice
     }
 
     /**
+     * Gets the address
+     *
+     * @return \Psa\Invoicing\Domain\Address
+     */
+    public function getAddress(): Address
+    {
+        return $this->Address;
+    }
+
+    /**
      * @link https://softwareengineering.stackexchange.com/questions/357969/ddd-injecting-services-on-entity-methods-calls
      */
-    public function calculate(InvoiceCalculator $calculator)
+    public function calculate()
     {
-        $result = $calculator->calculate($this);
+        $result = $this->Calculator->calculate($this);
 
         $this->gross = $result->getGross();
         $this->nett = $result->getNett();
@@ -159,10 +185,20 @@ class Invoice
         return $invoice;
     }
 
+    public function getCountryCode()
+    {
+        return $this->Address->getCountryCode();
+    }
+
     /**
-     * @return array
+     * Specify data which should be serialized to JSON
+     *
+     * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
      */
-    public function toArray(): array
+    public function jsonSerialize()
     {
         return [
             'id' => $this->id,
@@ -170,8 +206,8 @@ class Invoice
             'gross' => $this->gross,
             'nett' => $this->nett,
             'vat' => $this->vat,
-            'address' => $this->Address->toArray(),
-            'invoice_lines' => $this->InvoiceLines->toArray()
+            'address' => $this->Address->jsonSerialize(),
+            'invoice_lines' => $this->InvoiceLines->jsonSerialize()
         ];
     }
 }

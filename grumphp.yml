@@ -1,4 +1,6 @@
 parameters:
     git_dir: .
     bin_dir: vendor/bin
-    tasks: {  }
+    tasks:
+      phpcs: ~
+      phpunit: ~

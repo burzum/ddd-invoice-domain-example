@@ -10,15 +10,11 @@ use Psa\Invoicing\Domain\Invoice;
  */
 class InvoiceCalculator
 {
-
-    protected $VATCalculator;
-
-    public function __construct()
-    {
-    }
-
     /**
+     * Calculates the invoices total to pay
      *
+     * @param \Psa\Invoicing\Domain\Invoice
+     * @return mixed
      */
     public function calculate(Invoice $invoice): InvoiceCalculatorResult
     {
@@ -29,6 +25,8 @@ class InvoiceCalculator
         foreach ($invoice->getLines() as $line) {
             $gross += $line->getPrice()->getValue();
         }
+
+        $this->VATCalculator->generate();
 
         return new InvoiceCalculatorResult(
             $gross,

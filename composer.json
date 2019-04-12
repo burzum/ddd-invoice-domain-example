@@ -9,6 +9,7 @@
         }
     ],
     "require": {
+        "ext-json": "*",
         "psr/http-server-handler": "^1.0",
         "beberlei/assert": "^3.2",
         "myclabs/php-enum": "^1.6",

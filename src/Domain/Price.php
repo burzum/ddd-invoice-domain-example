@@ -10,10 +10,24 @@ use Psa\Invoicing\Common\Currency;
  */
 class Price
 {
-
+    /**
+     * @var \Psa\Invoicing\Common\Currency
+     */
     protected $currency;
+
+    /**
+     * Value
+     *
+     * @var float
+     */
     protected $value;
 
+    /**
+     * Construct
+     *
+     * @param float $value Value
+     * @param \Psa\Invoicing\Common\Currency
+     */
     public function __construct(
         float $value,
         Currency $currency
@@ -22,12 +36,22 @@ class Price
         $this->value = $value;
     }
 
-    public function getCurrency()
+    /**
+     * Gets the currency
+     *
+     * @return \Psa\Invoicing\Common\Currency
+     */
+    public function getCurrency(): Currency
     {
         return $this->currency;
     }
 
-    public function getValue()
+    /**
+     * Gets the value
+     *
+     * @return float
+     */
+    public function getValue(): float
     {
         return $this->value;
     }

@@ -4,11 +4,12 @@ declare(strict_types = 1);
 namespace Psa\Invoicing\Domain;
 
 use Assert\Assert;
+use Psa\Invoicing\Common\EntityInterface;
 
 /**
  * InvoiceLine
  */
-class InvoiceLine
+class InvoiceLine implements EntityInterface
 {
     protected $id;
     protected $itemId;
@@ -22,8 +23,8 @@ class InvoiceLine
      * Constructor
      */
     public function __construct(
-        ?int $id,
-        ItemId $itemId,
+        ?string $id,
+        string $itemId,
         string $itemName,
         int $quantity,
         Price $price,
@@ -31,7 +32,6 @@ class InvoiceLine
     ) {
         Assert::that($itemId)->notBlank();
         Assert::that($itemName)->notBlank();
-        Assert::that($price)->float();
 
         $this->id = $id;
         $this->itemId = $itemId;
@@ -39,32 +39,59 @@ class InvoiceLine
         $this->itemDescription = $description;
         $this->quantity = $quantity;
         $this->price = $price;
-        $this->total = new Price((float)($this->price->getValue() * $this->quantity), $price->getCurrency());
     }
 
+    /**
+     * Gets the price
+     *
+     * @return \Psa\Invoicing\Domain\Price
+     */
     public function getPrice(): Price
     {
         return $this->price;
     }
 
+    /**
+     * Gets the total price
+     *
+     * @return \Psa\Invoicing\Domain\Price
+     */
     public function getTotal(): Price
     {
         return new Price($this->price->getValue() * $this->quantity, $this->currency);
     }
 
-    public function getId(): int
+    /**
+     *
+     */
+    public function getItemId()
     {
+        return $this->itemId;
     }
 
-    public function toArray(): array
+    /**
+     * Gets the id
+     *
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,
             'item_id' => $this->itemName,
             'item_name' => $this->itemName,
             'item_description' => $this->itemName,
-            'price' => $this->quantity,
-            'quantity' => $this->quantity
+            'price' => $this->getPrice(),
+            'quantity' => $this->quantity,
+            'total' => $this->getTotal()
         ];
     }
 }
