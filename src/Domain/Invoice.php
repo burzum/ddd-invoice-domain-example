@@ -83,7 +83,7 @@ class Invoice implements AggregateInterface
      */
     protected function calculateDueDates(?DateTimeInterface $date = null): self
     {
-        if (empty($date)) {
+        if ($date === null) {
             $date = new DueDate();
         }
 
@@ -164,6 +164,17 @@ class Invoice implements AggregateInterface
         $this->gross = $result->getGross();
         $this->nett = $result->getNett();
         $this->VAT = $result->getVAT();
+        $this->vatTaxRate = $result->getTaxRate();
+    }
+
+    /**
+     * getVATTaxRate
+     *
+     * @return float
+     */
+    public function getVATTaxRate(): float
+    {
+        return $this->vatTaxRate;
     }
 
     /**

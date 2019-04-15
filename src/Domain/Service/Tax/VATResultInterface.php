@@ -36,5 +36,5 @@ interface VATResultInterface extends JsonSerializable
      *
      * @return float
      */
-    public function getPercentage() : float;
+    public function getTaxRate() : float;
 }

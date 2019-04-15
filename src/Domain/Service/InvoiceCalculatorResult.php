@@ -26,24 +26,24 @@ class InvoiceCalculatorResult
     /**
      * @var float
      */
-    protected $VATTaxRate = 0.00;
+    protected $taxRate = 0.00;
 
     /**
      * @param float $gross Gross
      * @param float $nett Nett
      * @param float $VAT VAT
-     * @param float $VATTaxRate VAT Tax Rate
+     * @param float $taxRate VAT Tax Rate
      */
     public function __construct(
         float $gross,
         float $nett,
         float $VAT,
-        float $VATTaxRate
+        float $taxRate
     ) {
         $this->gross = $gross;
         $this->nett = $nett;
         $this->VAT = $VAT;
-        $this->VATTaxRate = $VATTaxRate;
+        $this->taxRate = $taxRate;
     }
 
     /**
@@ -73,8 +73,8 @@ class InvoiceCalculatorResult
     /**
      * @return float
      */
-    public function getVATTaxRate(): float
+    public function getTaxRate(): float
     {
-        return $this->VATTaxRate;
+        return $this->taxRate;
     }
 }

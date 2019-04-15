@@ -20,7 +20,7 @@ class SwissVatRule
      * @param float $nett Total amount before tax has been applied
      * @return \Psa\Invoicing\Domain\Service\Tax\VATResultInterface
      */
-    public function calculate(float $nett) : VATResultInterface
+    public function calculate(float $nett): VATResultInterface
     {
         $vat = ($nett / 100) * static::TAX_RATE;
         $vat = (float)sprintf('%.2f', $vat);
@@ -34,10 +34,9 @@ class SwissVatRule
      * Method to round off a value as per the custom rules for switzerland
      *
      * @param float $value Value to be rounded as per custom rules
-     * @param int $countryId Country Id
      * @return float
      */
-    protected function round(float $value) : float
+    protected function round(float $value): float
     {
         return (float)(round($value / 0.05) * 0.05);
     }

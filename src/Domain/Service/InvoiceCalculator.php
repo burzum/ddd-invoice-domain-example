@@ -28,17 +28,17 @@ class InvoiceCalculator
          * @var \Psa\Invoicing\Domain\InvoiceLine $line
          */
         foreach ($invoice->getLines() as $line) {
-            $gross += $line->getTotal()->getValue();
+            $nett += $line->getTotal()->getValue();
         }
 
         $VATCalculator = new VATCalculator();
-        $vatResult = $VATCalculator->calculate(new Country($invoice->getCountryCode()), $gross);
+        $vatResult = $VATCalculator->calculate(new Country($invoice->getCountryCode()), $nett);
 
         return new InvoiceCalculatorResult(
-            $gross,
-            $nett,
-            $vat,
-            $gross
+            $vatResult->getGross(),
+            $vatResult->getNett(),
+            $vatResult->getVat(),
+            $vatResult->getTaxRate()
         );
     }
 }

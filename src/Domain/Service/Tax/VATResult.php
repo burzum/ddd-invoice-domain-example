@@ -18,11 +18,11 @@ class VATResult implements VATResultInterface
     protected $vat = 0.00;
 
     /**
-     * VAT in percentage
+     * Tax Rate
      *
      * @var float
      */
-    protected $percentage = 0.00;
+    protected $taxRate = 0.00;
 
     /**
      * Gross
@@ -44,14 +44,18 @@ class VATResult implements VATResultInterface
      * @param float $gross Gross
      * @param float $nett Nett
      * @param float $vat VAT value
-     * @param float $percentage VAT in percent
+     * @param float $taxRate Tax Rate
      */
-    public function __construct(float $gross, float $nett, float $vat, float $percentage)
+    public function __construct(float $gross, float $nett, float $vat, float $taxRate)
     {
-        $this->vat = $vat;
-        $this->percentage = $percentage;
-        $this->gross = $gross;
-        $this->nett = $nett;
+        $trimNumber = function ($float) {
+            return (float)sprintf('%.2f', $float);
+        };
+
+        $this->vat = $trimNumber($vat);
+        $this->taxRate = $trimNumber($taxRate);
+        $this->gross = $trimNumber($gross);
+        $this->nett = $trimNumber($nett);
     }
 
     /**
@@ -89,9 +93,9 @@ class VATResult implements VATResultInterface
      *
      * @return float
      */
-    public function getPercentage(): float
+    public function getTaxRate(): float
     {
-        return $this->percentage;
+        return $this->taxRate;
     }
 
     /**
@@ -103,7 +107,7 @@ class VATResult implements VATResultInterface
     {
         return [
             'vat' => $this->vat,
-            'percentage' => $this->percentage,
+            'taxRate' => $this->taxRate,
             'gross' => $this->gross,
             'nett' => $this->nett
         ];
