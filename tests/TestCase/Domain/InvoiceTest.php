@@ -57,8 +57,8 @@ class InvoiceTest extends TestCase
 
         $this->assertEquals(129.70, $invoice->getGross());
         $this->assertEquals(120.43, $invoice->getNett());
-        //$this->assertEquals(9.25, $invoice->getVAT());
-        //$this->assertEquals(SwissVatRule::TAX_RATE, $invoice->getVATTaxRate());
+        $this->assertEquals(9.25, $invoice->getVAT());
+        $this->assertEquals(SwissVatRule::TAX_RATE, $invoice->getVATTaxRate());
 
         $result = $invoice->jsonSerialize();
         //var_dump(json_encode($invoice->jsonSerialize()));
