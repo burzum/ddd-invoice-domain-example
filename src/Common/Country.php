@@ -11,10 +11,11 @@ use SplEnum;
  */
 class Country extends Enum
 {
-    const DEFAULT = self::CHF;
+    const DEFAULT = self::USA;
 
     const DEU = 'DEU';
     const JAP = 'JAP';
     const USA = 'USA';
-    const CHE = 'CHE';
+    const CHE = 'CHE'; // Swiss
+    const LIE = 'LIE'; // Liechtenstein
 }

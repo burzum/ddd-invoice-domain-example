@@ -5,6 +5,7 @@ namespace Psa\Invoicing\Domain;
 
 use Assert\Assert;
 use Psa\Invoicing\Common\Country;
+use Psa\Invoicing\Common\EntityInterface;
 use Psa\Invoicing\Common\Salutation;
 use Psa\Invoicing\Common\Title;
 use RuntimeException;
@@ -12,7 +13,7 @@ use RuntimeException;
 /**
  * Address
  */
-class Address
+class Address implements EntityInterface
 {
     protected $title = '';
     protected $salutation = '';
@@ -40,7 +41,7 @@ class Address
         ?string $street2 = null,
         string $city,
         string $zip,
-        string $country,
+        Country $country,
         string $countryState
     ) {
         if (empty($company) && empty($lastName)) {
@@ -63,5 +64,30 @@ class Address
     public function getCountryCode()
     {
         return $this->country;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'title' => $this->title,
+            'salutation' => (string)$this->salutation,
+            'first_name' => $this->firstName,
+            'middle_name' => $this->middlename,
+            'last_name' => $this->lastName,
+            'company' => $this->company,
+            'street' => $this->street,
+            'street2' => $this->street2,
+            'city' => $this->city,
+            'zip' => $this->zip,
+            'country' => $this->country,
+        ];
     }
 }

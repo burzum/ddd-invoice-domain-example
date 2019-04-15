@@ -14,18 +14,17 @@ class VATCalculator
     /**
      * Calculates the VAT for an invoice
      *
-     * @return
+     * @return \Psa\Invoicing\Domain\Service\Tax\VATResultInterface
      */
-    public function calculate(Invoice $invoice)
+    public function calculate(Country $country, float $gross)
     {
-        $countryCode = $invoice->getCountryCode();
-        if ($countryCode === Country::CHE() || $countryCode === Country::LIE()) {
-            return (new SwissVatRule())->calculate($nett);
+        if ($country->equals(Country::CHE()) || $country->equals(Country::LIE())) {
+            return (new SwissVatRule())->calculate($gross);
         }
 
         $vat = (float)0;
         $percent = (float)0;
-        $gross = $nett + $vat;
+        $nett = $gross + $vat;
 
         return new VATResult($gross, $nett, $vat, $percent);
     }

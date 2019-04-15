@@ -5,6 +5,7 @@ namespace Psa\Invoicing\Test\TestCase\Domain;
 
 use DateTime;
 use PHPUnit\Framework\TestCase;
+use Psa\Invoicing\Common\Country;
 use Psa\Invoicing\Common\Currency;
 use Psa\Invoicing\Common\Deconstruct;
 use Psa\Invoicing\Common\Salutation;
@@ -16,6 +17,7 @@ use Psa\Invoicing\Domain\ItemId;
 use Psa\Invoicing\Domain\PaymentStatus;
 use Psa\Invoicing\Domain\Price;
 use Psa\Invoicing\Domain\Service\InvoiceCalculator;
+use Psa\Invoicing\Domain\Service\Tax\SwissVatRule;
 use Psa\Invoicing\Domain\Service\VATCalculator;
 use Ramsey\Uuid\Uuid;
 
@@ -31,39 +33,39 @@ class InvoiceTest extends TestCase
      */
     public function testCreating(): void
     {
-        $this->markTestSkipped('incomplete');
-
-        $address = new Address(
-            null,
-            Salutation::MR(),
-            'Florian',
-            null,
-            'Krämer',
-            'PSA Publishers Ltd.',
-            'Langstraße 31',
-            null,
-            'Zürich',
-            '12345',
-            'CH',
-            'ZH'
-        );
-
-        $invoiceLines = new InvoiceLinesCollection();
-        $invoiceLines->add(new InvoiceLine(null, '1', 'test', 10, new Price(10, Currency::EUR())));
-        $invoiceLines->add(new InvoiceLine(null, '2', 'test', 10, new Price(10, Currency::EUR())));
-
-        $invoiceCalculator = new InvoiceCalculator();
-
+        $this->markTestSkipped();
         $invoice = new Invoice(
-            $address,
-            $invoiceLines,
+            new InvoiceCalculator(),
+            new Address(
+                null,
+                Salutation::MR(),
+                'Florian',
+                null,
+                'Krämer',
+                'PSA Publishers Ltd.',
+                'Langstraße 31',
+                null,
+                'Zürich',
+                '12345',
+                Country::CHE(),
+                'ZH'
+            ),
+            Currency::EUR(),
             (string)(Uuid::uuid4()),
             null,
-            'EUR',
             '1234'
         );
 
-        $result = $invoice->jsonSerialize();
-        var_dump($result);
+        $invoice->addLine(new InvoiceLine(null, '1', 'This', 10, new Price(9.01, Currency::EUR())));
+        $invoice->addLine(new InvoiceLine(null, '2', 'That', 3, new Price(10.11, Currency::EUR())));
+
+        $this->assertEquals(120.43, $invoice->getGross());
+        $this->assertEquals(140, $invoice->getNett());
+        $this->assertEquals(140, $invoice->getVAT());
+
+
+        // $result = $invoice->jsonSerialize();
+        //var_dump(json_encode($invoice->jsonSerialize()));
+        //var_dump($result);
     }
 }

@@ -3,7 +3,9 @@ declare(strict_types = 1);
 
 namespace Psa\Invoicing\Domain\Service;
 
+use Psa\Invoicing\Common\Country;
 use Psa\Invoicing\Domain\Invoice;
+use Psa\Invoicing\Domain\Service\Tax\VATCalculator;
 
 /**
  * InvoiceCalculator
@@ -22,16 +24,21 @@ class InvoiceCalculator
         $nett = 0.00;
         $vat = 0.00;
 
+        /**
+         * @var \Psa\Invoicing\Domain\InvoiceLine $line
+         */
         foreach ($invoice->getLines() as $line) {
-            $gross += $line->getPrice()->getValue();
+            $gross += $line->getTotal()->getValue();
         }
 
-        $this->VATCalculator->generate();
+        $VATCalculator = new VATCalculator();
+        $vatResult = $VATCalculator->calculate(new Country($invoice->getCountryCode()), $gross);
 
         return new InvoiceCalculatorResult(
             $gross,
             $nett,
-            $vat
+            $vat,
+            $gross
         );
     }
 }

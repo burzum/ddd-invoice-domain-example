@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Psa\Invoicing\Test\TestCase\Domain;
 
 use PHPUnit\Framework\TestCase;
+use Psa\Invoicing\Common\Country;
 use Psa\Invoicing\Common\Salutation;
 use Psa\Invoicing\Common\Title;
 use Psa\Invoicing\Domain\Address;
@@ -31,8 +32,10 @@ class AddressTest extends TestCase
             null,
             'Zürich',
             '12345',
-            'CH',
+            new Country('CHE'),
             'ZH'
         );
+
+        $this->assertIsArray($address->jsonSerialize());
     }
 }

@@ -1,4 +1,6 @@
 <?php
+namespace Psa\Invoicing;
+
 /**
  * Initial Migration
  */
@@ -27,6 +29,9 @@ class InitialMigration
             ->addColumn('currency_code', 'char', ['null' => true, 'length' => 2, 'null' => false])
             // Indexes
             ->addIndex(['user_id'])
+            ->create();
+
+        $this->table('invoice_numbers')
             ->create();
     }
 }

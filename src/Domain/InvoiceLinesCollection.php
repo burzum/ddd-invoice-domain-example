@@ -7,6 +7,7 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use JsonSerializable;
+use RuntimeException;
 
 /**
  * Invoice Lines Collection
@@ -40,6 +41,12 @@ class InvoiceLinesCollection implements IteratorAggregate, Countable, JsonSerial
      */
     public function add(InvoiceLine $line): InvoiceLinesCollection
     {
+        foreach ($this->lines as $existingLine) {
+            if ($existingLine->isSameAs($line)) {
+                throw new RuntimeException('The line item already exists on this invoice');
+            }
+        }
+
         $this->lines[] = $line;
 
         return $this;

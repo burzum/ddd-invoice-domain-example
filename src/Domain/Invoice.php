@@ -10,7 +10,6 @@ use DateInterval;
 use Psa\Invoicing\Common\AggregateInterface;
 use Psa\Invoicing\Common\Currency;
 use Psa\Invoicing\Domain\Exception\CurrencyMissMatchException;
-use Psa\Invoicing\Domain\Exception\EmptyInvoiceException;
 use Psa\Invoicing\Domain\Service\InvoiceCalculator;
 
 /**
@@ -40,8 +39,9 @@ class Invoice implements AggregateInterface
     protected $paymentStatus = PaymentStatus::UNPAID;
     protected $gross = 0.00;
     protected $nett = 0.00;
-    protected $vat = 0.00;
-    protected $currency = Currency::DEFAULT;
+    protected $VAT = 0.00;
+    protected $currency;
+    protected $vatTaxRate = 0.00;
     protected $vatPercent = 0.00;
     protected $dueDate = null;
     protected $firstReminder = null;
@@ -57,22 +57,20 @@ class Invoice implements AggregateInterface
     public function __construct(
         InvoiceCalculator $Calculator,
         Address $address,
-        InvoiceLinesCollection $invoiceLines,
+        ?Currency $currencyCode,
         string $id,
         ?string $companyId,
-        Currency $currencyCode,
         string $invoiceNumber
     ) {
-        Assert::that($invoiceLines, 'An invoice must have at least one item')->minCount(1);
         Assert::that($id)->uuid();
 
         $this->Address = $address;
-        $this->InvoiceLines = $invoiceLines;
         $this->Calculator = $Calculator;
+        $this->InvoiceLines = new InvoiceLinesCollection();
 
         $this->id = $id;
         $this->companyId = $companyId;
-        $this->currencyCode = $currencyCode;
+        $this->currency = $currencyCode === null ? Currency::CHF() : $currencyCode;
         $this->invoiceNumber = $invoiceNumber;
         $this->paymentStatus = PaymentStatus::UNPAID();
     }
@@ -108,7 +106,7 @@ class Invoice implements AggregateInterface
     public function paid(
         ?DateTimeInterface $paymentDate,
         ?PaymentStatus $paymentStatus
-    ) {
+    ): self {
         $this->paymentDate = $paymentDate === null ? new DateTime() : $paymentDate;
         $this->paymentStatus = $paymentStatus === null ? PaymentStatus::PAID() : $paymentStatus;
 
@@ -123,12 +121,15 @@ class Invoice implements AggregateInterface
      */
     public function addLine(InvoiceLine $line): self
     {
-        if ($this->currency !== $line->getPrice()->getCurrency()) {
+        if (!$this->currency->equals($line->getPrice()->getCurrency())) {
             throw CurrencyMissMatchException::create($this, $line);
         }
 
         $this->InvoiceLines->add($line);
+        // Should this be the only place to call this?
         $this->calculate();
+
+        return $this;
     }
 
     /**
@@ -152,9 +153,11 @@ class Invoice implements AggregateInterface
     }
 
     /**
+     * Calculates the invoice
+     *
      * @link https://softwareengineering.stackexchange.com/questions/357969/ddd-injecting-services-on-entity-methods-calls
      */
-    public function calculate()
+    protected function calculate()
     {
         $result = $this->Calculator->calculate($this);
 
@@ -164,25 +167,38 @@ class Invoice implements AggregateInterface
     }
 
     /**
-     * Creates a new invoice
+     * Gross
      *
-     * @return \Psa\Invoicing\Domain\Invoice
+     * @return float
      */
-    public static function create(
-        InvoiceCalculator $invoiceCalculator,
-        Address $address,
-        InvoiceLinesCollection $invoiceLines,
-        Currency $currency,
-        ?DateTime $invoiceDate
-    ): Invoice {
-        $invoice = new self($address, $invoiceLines);
-        $invoice->id = new InvoiceId();
-        $invoice->currency = $currency;
-        $invoice->invoiceDate = $invoiceDate === null ? new DateTime() : $invoiceDate;
-        $invoice->calculateDueDates();
-        $invoice->calculate($invoiceCalculator);
+    public function getGross(): float
+    {
+        return $this->gross;
+    }
 
-        return $invoice;
+    /**
+     * Nett
+     *
+     * @return float
+     */
+    public function getNett(): float
+    {
+        return $this->nett;
+    }
+
+    /**
+     * VAT
+     *
+     * @return float
+     */
+    public function getVAT(): float
+    {
+        return $this->VAT;
+    }
+
+    public function getCurrency()
+    {
+        return $this->currency;
     }
 
     public function getCountryCode()
@@ -205,7 +221,7 @@ class Invoice implements AggregateInterface
             'invoice_number' => $this->invoiceNumber,
             'gross' => $this->gross,
             'nett' => $this->nett,
-            'vat' => $this->vat,
+            'vat' => $this->VAT,
             'address' => $this->Address->jsonSerialize(),
             'invoice_lines' => $this->InvoiceLines->jsonSerialize()
         ];

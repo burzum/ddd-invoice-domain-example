@@ -7,6 +7,9 @@ use MyCLabs\Enum\Enum;
 
 /**
  * PaymentStatus
+ *
+ * @method PAID()
+ * @method UNPAID()
  */
 class PaymentStatus extends Enum
 {

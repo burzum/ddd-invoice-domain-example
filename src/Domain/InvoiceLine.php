@@ -18,6 +18,7 @@ class InvoiceLine implements EntityInterface
     protected $quantity;
     protected $price;
     protected $currency;
+    protected $total;
 
     /**
      * Constructor
@@ -32,6 +33,7 @@ class InvoiceLine implements EntityInterface
     ) {
         Assert::that($itemId)->notBlank();
         Assert::that($itemName)->notBlank();
+        Assert::that($quantity)->greaterThan(0);
 
         $this->id = $id;
         $this->itemId = $itemId;
@@ -39,6 +41,22 @@ class InvoiceLine implements EntityInterface
         $this->itemDescription = $description;
         $this->quantity = $quantity;
         $this->price = $price;
+        $this->total = new Price(
+            $this->price->getValue() * (float)$this->quantity,
+            $this->price->getCurrency()
+        );
+    }
+
+    /**
+     * Is the same as
+     *
+     * @param \Psa\Invoicing\Domain\InvoiceLine $invoiceLine Invoice Line
+     * @return bool
+     */
+    public function isSameAs(InvoiceLine $invoiceLine): bool
+    {
+        return $this->price->isSameAs($invoiceLine->getPrice())
+            && $this->itemId === $invoiceLine->getItemId();
     }
 
     /**
@@ -58,11 +76,13 @@ class InvoiceLine implements EntityInterface
      */
     public function getTotal(): Price
     {
-        return new Price($this->price->getValue() * $this->quantity, $this->currency);
+        return $this->total;
     }
 
     /**
+     * Gets the item id
      *
+     * @return string|int
      */
     public function getItemId()
     {
